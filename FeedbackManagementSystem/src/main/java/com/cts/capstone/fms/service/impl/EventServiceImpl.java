@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import com.cts.capstone.fms.DTO.Event;
+import com.cts.capstone.fms.domain.Event;
 import com.cts.capstone.fms.repositories.EventRepository;
 import com.cts.capstone.fms.service.EventService;
 

@@ -3,8 +3,8 @@ package com.cts.capstone.fms.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.cts.capstone.fms.DTO.FmsUser;
-import com.cts.capstone.fms.DTO.Role;
+import com.cts.capstone.fms.domain.FmsUser;
+import com.cts.capstone.fms.domain.Role;
 import com.cts.capstone.fms.repositories.FmsUserRepository;
 import com.cts.capstone.fms.service.FmsUserService;
 
@@ -16,6 +16,11 @@ public class FmsUserServiceImpl implements FmsUserService{
 	
 	@Autowired
 	FmsUserRepository fmsUserRepository;
+	
+	@Override
+	public Flux<FmsUser> getAllUsers() {
+		return Flux.fromIterable(fmsUserRepository.findAll());
+	}
 
 	@Override
 	public Mono<FmsUser> getUserByUserId(Long userId) {
@@ -31,5 +36,10 @@ public class FmsUserServiceImpl implements FmsUserService{
 	public Flux<FmsUser> getUsersByRole(Role role) {
 		return Flux.fromIterable(fmsUserRepository.findByRole(role));
 	}
-	
+
+	@Override
+	public Mono<FmsUser> saveUser(FmsUser user) {
+		return Mono.just(fmsUserRepository.save(user));
+	}
+
 }

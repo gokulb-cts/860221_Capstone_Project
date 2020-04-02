@@ -6,7 +6,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.cts.capstone.fms.DTO.Dashboard;
+
+import com.cts.capstone.fms.domain.Dashboard;
 import com.cts.capstone.fms.service.EventService;
 
 import lombok.extern.slf4j.Slf4j;

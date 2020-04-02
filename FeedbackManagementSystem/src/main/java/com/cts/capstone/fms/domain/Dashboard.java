@@ -1,4 +1,4 @@
-package com.cts.capstone.fms.DTO;
+package com.cts.capstone.fms.domain;
 
 
 import lombok.Data;

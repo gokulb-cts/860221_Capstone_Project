@@ -18,9 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.cts.capstone.fms.DTO.Event;
+import com.cts.capstone.fms.domain.Event;
 import com.cts.capstone.fms.service.EventService;
-
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;;
@@ -39,10 +38,12 @@ public class EventRestController {
 		return eventService.getEvents();
 	}
 	
-	@GetMapping(value = EVENT_END_POINT+"/{id}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
-	public Mono<Event> getEventByEventId(@PathVariable String eventId) {
+	@GetMapping(value = EVENT_END_POINT+"/{eventId}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
+	public Mono<ResponseEntity<Event>> getEventByEventId(@PathVariable String eventId) {
 		log.info("getEventByEventId()");
-		return eventService.getEventByEventId(eventId);
+		return eventService.getEventByEventId(eventId)
+						   .map(event -> new ResponseEntity<Event>(event, HttpStatus.OK))
+						   .defaultIfEmpty(new ResponseEntity<Event>(HttpStatus.NOT_FOUND));
 	}
 	
 	@PostMapping(value = EVENT_END_POINT, produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
@@ -53,7 +54,6 @@ public class EventRestController {
 		return eventService.saveEvent(event)
 						   .map(savedEvent -> 
 				   					{
-				   						log.info(savedEvent.toString());
 										URI location = 
 												uriBuilder
 												.path("/{id}")

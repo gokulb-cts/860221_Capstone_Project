@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class Dashboard {
-	private int totalEvents;
+	private long totalEvents;
 	private int liveImpacted;
 	private int totalVolunteers;
 	private int totalParticipants;

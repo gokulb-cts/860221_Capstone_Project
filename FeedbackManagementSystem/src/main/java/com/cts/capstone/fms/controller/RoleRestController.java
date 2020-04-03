@@ -1,6 +1,5 @@
 package com.cts.capstone.fms.controller;
 
-import static com.cts.capstone.fms.constants.FmsUserConstants.USER_END_POINT;
 import static com.cts.capstone.fms.constants.RoleConstants.ROLE_END_POINT;
 
 import java.net.URI;
@@ -16,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import com.cts.capstone.fms.constants.RoleConstants;
+
 import com.cts.capstone.fms.domain.Role;
 import com.cts.capstone.fms.service.RoleService;
 
@@ -26,7 +25,7 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @Slf4j
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 public class RoleRestController {
 	
 	@Autowired
@@ -67,4 +66,5 @@ public class RoleRestController {
 									})
 						   .defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
 	}
+	
 }

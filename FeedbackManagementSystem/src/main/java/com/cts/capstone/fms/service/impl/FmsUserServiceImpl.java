@@ -12,11 +12,11 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
-public class FmsUserServiceImpl implements FmsUserService{
-	
+public class FmsUserServiceImpl implements FmsUserService {
+
 	@Autowired
 	FmsUserRepository fmsUserRepository;
-	
+
 	@Override
 	public Flux<FmsUser> getAllUsers() {
 		return Flux.fromIterable(fmsUserRepository.findAll());

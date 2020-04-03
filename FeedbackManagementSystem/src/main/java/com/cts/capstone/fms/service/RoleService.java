@@ -10,7 +10,7 @@ public interface RoleService {
 	Flux<Role> getAllRoles();
 
 	Mono<Role> getRoleByRoleId(Long roleId);
-	
+
 	Mono<Role> getRoleByRoleName(String roleName);
 
 	Mono<Role> saveRole(Role role);

@@ -1,9 +1,12 @@
 package com.cts.capstone.fms.domain;
 
+import java.io.Serializable;
 import java.util.Date;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -19,9 +22,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Event {
+public class Event implements Serializable {
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	@NotNull(message = "Event Id is empty or missing")
 	private String eventId;
@@ -35,13 +38,14 @@ public class Event {
 	private String project;
 	private String category;
 	private int totalNoOfVolunteers;
-	private double total_volunteer_hours;
-	private double total_travel_hours;
-	private double overall_volunteering_hours;
+	private double totalVolunteerHours;
+	private double totalTravelHours;
+	private double overallVolunteeringHours;
 	private int livesImpacted;
 	private int activityType;
 	private String status;
+	
 	@OneToOne(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
-	@JoinColumn(name = "pocId", referencedColumnName = "userId")
-	private FmsUser fmsUser;
+	@JoinColumn(name = "poc_id", referencedColumnName = "userId")
+	private FmsUser pocUser;
 }

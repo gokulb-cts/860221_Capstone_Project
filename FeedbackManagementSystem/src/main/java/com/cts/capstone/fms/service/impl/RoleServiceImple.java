@@ -29,7 +29,7 @@ public class RoleServiceImple implements RoleService {
 
 	@Override
 	public Mono<Role> getRoleByRoleName(String roleName) {
-		return Mono.justOrEmpty(roleRepository.findByRoleName(roleName));
+		return Mono.justOrEmpty(roleRepository.findByRoleNameIgnoreCase(roleName));
 	}
 
 	@Override

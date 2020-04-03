@@ -8,6 +8,6 @@ import com.cts.capstone.fms.domain.Role;
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Long>{
 	
-	Role findByRoleName(String roleName);
+	Role findByRoleNameIgnoreCase(String roleName);
 	
 }

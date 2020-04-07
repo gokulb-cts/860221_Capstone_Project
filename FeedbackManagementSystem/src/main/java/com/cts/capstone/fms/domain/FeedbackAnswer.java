@@ -1,12 +1,11 @@
 package com.cts.capstone.fms.domain;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -14,22 +13,20 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Data;
 
-@Table(name = "role")
+@Table(name = "feedback_answer")
 @Entity
 @Data
 @JsonIgnoreProperties(value = {"createdBy","createdDate","modifiedBy","lastModifiedDate"}, allowSetters = true)
-public class Role implements Serializable {
-
-	private static final long serialVersionUID = 1L;
-	
+public class FeedbackAnswer {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long roleId;
+	private Long id;
 	
-	@NotNull(message = "Role Name is missing/empty")
-	private String roleName;
+	@ManyToOne
+	@JoinColumn(name = "question_id")
+	private FeedbackQuestion feedbackQuestion;
 	
-	private String roleDescription;
+	@NotNull(message = "Answer Text is missing/empty")
+	private String answerText;
 	
 	private Long createdBy;
 	
@@ -37,8 +34,6 @@ public class Role implements Serializable {
 	
 	private Long modifiedBy;
 	
-	private Date lastModifiedDate;
-	
-	private byte activeStatus;
+	private Date lastModifiedDate; 
 
 }

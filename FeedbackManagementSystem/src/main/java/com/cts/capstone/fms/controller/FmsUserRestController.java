@@ -5,6 +5,7 @@ import static com.cts.capstone.fms.constants.FmsUserConstants.USER_END_POINT;
 
 import java.net.URI;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.cts.capstone.fms.domain.FmsUser;
+import com.cts.capstone.fms.dto.FmsUserDto;
 import com.cts.capstone.fms.exception.RoleNotFoundException;
 import com.cts.capstone.fms.service.FmsUserService;
 import com.cts.capstone.fms.service.RoleService;
@@ -86,22 +88,31 @@ public class FmsUserRestController {
 	}
 
 	@PostMapping(value = USER_END_POINT, produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
-	public Mono<ResponseEntity<Object>> addUser(@RequestBody FmsUser user) {
-		log.info("registerUser()" + user);
+	public Mono<ResponseEntity<Object>> addUser(@RequestBody FmsUserDto userDto) {
+		log.info("registerUser()" + userDto);
 		ServletUriComponentsBuilder uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
 
-		return fmsUserService.saveUser(user).map(savedUser -> {
+		return fmsUserService.saveUser(userDto).map(savedUser -> {
 			URI location = uriBuilder.path("/{userId}").buildAndExpand(savedUser.getUserId()).toUri();
 			return ResponseEntity.created(location).build();
 		}).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
 	}
 
+	@PatchMapping(value = USER_END_POINT + "/{userId}", 
+			produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
+	public Mono<ResponseEntity<FmsUser>> updateUser(@PathVariable Long userId) {
+		log.info("updateUser()");
+		
+		return null;
+	}
+	
+	
 	@PatchMapping(value = USER_END_POINT
 			+ "/{userId}/role/{roleName}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Mono<ResponseEntity<FmsUser>> assignUserRole(@PathVariable Long userId, @PathVariable String roleName) {
 		log.info("assignUserRole()");
 
-		return roleService.getRoleByRoleName(roleName)
+		/*return roleService.getRoleByRoleName(roleName)
 				.switchIfEmpty(Mono.defer(() -> Mono.error(new RoleNotFoundException(ROLE_NOT_FOUND))))
 				.flatMap((role) -> {
 					return fmsUserService.getUserByUserId(userId).flatMap(user -> {
@@ -109,7 +120,8 @@ public class FmsUserRestController {
 						return fmsUserService.saveUser(user);
 					}).map(updatedUser -> new ResponseEntity<>(updatedUser, HttpStatus.OK))
 							.defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-				});
+				});*/
+		return null;
 	}
 
 }

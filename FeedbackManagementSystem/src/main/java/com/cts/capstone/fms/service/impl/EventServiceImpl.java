@@ -1,14 +1,17 @@
 package com.cts.capstone.fms.service.impl;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.stereotype.Service;
+
+import com.cts.capstone.fms.domain.Event;
+import com.cts.capstone.fms.dto.EventDto;
+import com.cts.capstone.fms.repositories.EventRepository;
+import com.cts.capstone.fms.service.EventService;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import com.cts.capstone.fms.domain.Event;
-import com.cts.capstone.fms.repositories.EventRepository;
-import com.cts.capstone.fms.service.EventService;
 
 @Service
 public class EventServiceImpl implements EventService {
@@ -17,7 +20,9 @@ public class EventServiceImpl implements EventService {
 	EventRepository eventRepository;
 	
 	@Override
-	public Mono<Event> saveEvent(Event event) {
+	public Mono<Event> saveEvent(EventDto eventDto) {
+		Event event  = new Event();
+		BeanUtils.copyProperties(eventDto, event);
 		return Mono.just(eventRepository.save(event));
 	}
 

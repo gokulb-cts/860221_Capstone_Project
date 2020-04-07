@@ -26,7 +26,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @Slf4j
 @RequestMapping("/api/v1")
-public class RoleRestController {
+public class RoleConfigRestController {
 	
 	@Autowired
 	public RoleService roleService; 

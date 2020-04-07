@@ -19,11 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.cts.capstone.fms.domain.Event;
-import com.cts.capstone.fms.domain.FmsUser;
-import com.cts.capstone.fms.enums.Authority;
+import com.cts.capstone.fms.dto.EventDto;
 import com.cts.capstone.fms.service.EventService;
-import com.cts.capstone.fms.service.FmsUserService;
-import com.cts.capstone.fms.service.RoleService;
 
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
@@ -51,8 +48,8 @@ public class EventRestController {
 	}
 
 	@PostMapping(value = EVENT_END_POINT, produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
-	public Mono<ResponseEntity<Object>> addEvent(@Valid @RequestBody Event event) {
-		log.info("saveEvent()" + event);
+	public Mono<ResponseEntity<Object>> addEvent(@Valid @RequestBody EventDto eventDto) {
+		log.info("saveEvent()" + eventDto);
 
 		/*
 		 * // Save User if not exists if (event.getPocId() != null && event.getPocId()
@@ -68,7 +65,7 @@ public class EventRestController {
 
 		ServletUriComponentsBuilder uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
 
-		return eventService.saveEvent(event).map(savedEvent -> {
+		return eventService.saveEvent(eventDto).map(savedEvent -> {
 			URI location = uriBuilder.path("/{id}").buildAndExpand(savedEvent.getEventId()).toUri();
 			return ResponseEntity.created(location).build();
 		}).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());

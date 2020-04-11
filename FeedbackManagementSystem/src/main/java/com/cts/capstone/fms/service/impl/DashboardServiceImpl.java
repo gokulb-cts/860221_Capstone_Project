@@ -16,19 +16,19 @@ public class DashboardServiceImpl implements DashboardService{
 
 	@Override
 	public Mono<Long> getTotalEvents() {
-		Mono<Long> count = eventService.getEvents().count();
+		Mono<Long> count = eventService.getAllEvents().count();
 		return count;
 	}
 
 	@Override
 	public Mono<Integer> getAllEventsTotalLivesImpacted() {
-		Mono<Integer> count = eventService.getEvents().map(event -> event.getLivesImpacted()).reduce(0, (a,b) -> a+b);
+		Mono<Integer> count = eventService.getAllEvents().map(event -> event.getLivesImpacted()).reduce(0, (a,b) -> a+b);
 		return count;
 	}
 
 	@Override
 	public Mono<Integer> getAllEventsTotalVolunteers() {
-		Mono<Integer> count = eventService.getEvents().map(event -> event.getTotalNoOfVolunteers()).reduce(0, (a,b) -> a+b);
+		Mono<Integer> count = eventService.getAllEvents().map(event -> event.getTotalNoOfVolunteers()).reduce(0, (a,b) -> a+b);
 		return count;
 	}
 

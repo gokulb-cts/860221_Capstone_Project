@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -35,9 +36,12 @@ public class EventRestController {
 	private EventService eventService;
 
 	@GetMapping(value = EVENT_END_POINT, produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
-	public Flux<Event> getAllEvents() {
+	public Flux<Event> getAllEvents(@RequestParam(value = "page", defaultValue = "0") int page,
+			@RequestParam(value = "limit", defaultValue = "25") int limit) {
 		log.info("getAllEvents()");
-		return eventService.getEvents();
+		if (page > 0)
+			page -= 1;
+		return eventService.getEvents(page, limit);
 	}
 
 	@GetMapping(value = EVENT_END_POINT + "/{eventId}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
@@ -50,18 +54,6 @@ public class EventRestController {
 	@PostMapping(value = EVENT_END_POINT, produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Mono<ResponseEntity<Object>> addEvent(@Valid @RequestBody EventDto eventDto) {
 		log.info("saveEvent()" + eventDto);
-
-		/*
-		 * // Save User if not exists if (event.getPocId() != null && event.getPocId()
-		 * != 0) { fmsUserService.getUserByUserId(event.getPocId()).switchIfEmpty(
-		 * Mono.defer(() ->
-		 * roleService.getRoleByRoleName(Authority.POC.toString())).flatMap(role -> {
-		 * FmsUser user = new FmsUser(); user.setUserId(event.getPocId());
-		 * user.setUserName(event.getPocId().toString()); user.setRole(role); return
-		 * fmsUserService.saveUser(user); }));
-		 * 
-		 * }
-		 */
 
 		ServletUriComponentsBuilder uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
 

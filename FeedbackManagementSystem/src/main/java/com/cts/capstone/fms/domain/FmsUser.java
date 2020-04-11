@@ -17,35 +17,35 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Data;
 
-@Table(name = "user")
 @Entity
+@Table(name = "user")
 @Data
-@JsonIgnoreProperties(value = {"encryptedPassword","createdBy","createdDate"}, allowSetters = true)
+//@JsonIgnoreProperties(value = { "encryptedPassword", "createdBy", "createdDate" }, allowSetters = true)
 public class FmsUser implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
-	@Column(nullable = false, unique = true)
+
+	@Column(unique = true)
 	private Long userId;
-	
+
 	@Column(nullable = false)
 	private String userName;
-	
-	@Column(nullable = false, unique = true)
+
 	private String emailId;
-	
+
 	private String encryptedPassword;
-	
+
 	private String mobileNumber;
-	
+
 	private Long createdBy;
-	
+
 	private Date createdDate;
-	
+
+	@Column(columnDefinition = "int default 1")
 	private byte activeStatus;
 
 	@OneToOne

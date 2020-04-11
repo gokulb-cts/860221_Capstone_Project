@@ -5,11 +5,13 @@ import static com.cts.capstone.fms.constants.FmsUserConstants.USER_END_POINT;
 
 import java.net.URI;
 
-import org.springframework.beans.BeanUtils;
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,27 +44,36 @@ public class FmsUserRestController {
 	private RoleService roleService;
 
 	@GetMapping(value = USER_END_POINT, produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
-	public Flux<FmsUser> getAllUsers() {
+	public Flux<FmsUser> getAllUsers(@RequestParam(value = "page", defaultValue = "0") int page,
+			@RequestParam(value = "limit", defaultValue = "25") int limit) {
 		log.info("getAllUsers()");
-		return fmsUserService.getAllUsers();
+		if (page > 0)
+			page -= 1;
+		return fmsUserService.getAllUsers(page, limit);
+
 	}
 
 	@GetMapping(value = USER_END_POINT + "/{userId}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Mono<ResponseEntity<FmsUser>> getUserByUserId(@PathVariable Long userId) {
+
 		log.info("getUserByUserId()");
 		return fmsUserService.getUserByUserId(userId).map(event -> new ResponseEntity<FmsUser>(event, HttpStatus.OK))
 				.defaultIfEmpty(new ResponseEntity<FmsUser>(HttpStatus.NOT_FOUND));
+
 	}
 
-	@GetMapping(value = USER_END_POINT +"/by", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
+	@GetMapping(value = USER_END_POINT + "/by", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Mono<ResponseEntity<FmsUser>> getUserByEmailId(@RequestParam("email") String emailId) {
+
 		log.info("getUserByEmailId()");
 		return fmsUserService.getUserByEmailId(emailId).map(event -> new ResponseEntity<FmsUser>(event, HttpStatus.OK))
 				.defaultIfEmpty(new ResponseEntity<FmsUser>(HttpStatus.NOT_FOUND));
+
 	}
 
 	@GetMapping(value = USER_END_POINT + "/role/{roleName}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Flux<ResponseEntity<FmsUser>> getUsersByRole(@PathVariable String roleName) {
+
 		log.info("getUsersByRole()");
 
 		return roleService.getRoleByRoleName(roleName)
@@ -85,10 +96,12 @@ public class FmsUserRestController {
 		// });
 		// .defaultIfEmpty(Flux.just(new
 		// ResponseEntity<FmsUser>(HttpStatus.NOT_FOUND)));
+
 	}
 
 	@PostMapping(value = USER_END_POINT, produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
-	public Mono<ResponseEntity<Object>> addUser(@RequestBody FmsUserDto userDto) {
+	public Mono<ResponseEntity<Object>> addUser(@Valid @RequestBody FmsUserDto userDto) {
+
 		log.info("registerUser()" + userDto);
 		ServletUriComponentsBuilder uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
 
@@ -96,32 +109,37 @@ public class FmsUserRestController {
 			URI location = uriBuilder.path("/{userId}").buildAndExpand(savedUser.getUserId()).toUri();
 			return ResponseEntity.created(location).build();
 		}).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
+
 	}
 
-	@PatchMapping(value = USER_END_POINT + "/{userId}", 
-			produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
-	public Mono<ResponseEntity<FmsUser>> updateUser(@PathVariable Long userId) {
+	@PatchMapping(value = USER_END_POINT + "/{userId}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
+	public Mono<ResponseEntity<FmsUser>> updateUser(@PathVariable Long userId, @RequestBody FmsUserDto userDto) {
+
 		log.info("updateUser()");
-		
-		return null;
+
+		return fmsUserService.updateUser(userId, userDto)
+				.map(updatedUser -> new ResponseEntity<>(updatedUser, HttpStatus.OK))
+				.defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+
 	}
-	
-	
+
 	@PatchMapping(value = USER_END_POINT
 			+ "/{userId}/role/{roleName}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Mono<ResponseEntity<FmsUser>> assignUserRole(@PathVariable Long userId, @PathVariable String roleName) {
+
 		log.info("assignUserRole()");
 
-		/*return roleService.getRoleByRoleName(roleName)
-				.switchIfEmpty(Mono.defer(() -> Mono.error(new RoleNotFoundException(ROLE_NOT_FOUND))))
-				.flatMap((role) -> {
-					return fmsUserService.getUserByUserId(userId).flatMap(user -> {
-						user.setRole(role);
-						return fmsUserService.saveUser(user);
-					}).map(updatedUser -> new ResponseEntity<>(updatedUser, HttpStatus.OK))
-							.defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-				});*/
-		return null;
+		return fmsUserService.updateUserRole(userId, roleName)
+				.map(updatedUser -> new ResponseEntity<>(updatedUser, HttpStatus.OK))
+				.defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+
 	}
 
+	@DeleteMapping(value = USER_END_POINT + "/{userId}")
+	public void deleteUser(@PathVariable Long userId) {
+
+		log.info("deleteUser()");
+		fmsUserService.deleteUser(userId);
+
+	}
 }

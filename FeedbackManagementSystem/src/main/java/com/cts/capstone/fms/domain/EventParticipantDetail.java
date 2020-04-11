@@ -1,6 +1,8 @@
 package com.cts.capstone.fms.domain;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -8,12 +10,13 @@ import javax.persistence.Table;
 
 import lombok.Data;
 
-@Table(name = "event_participant_detail")
 @Entity
+@Table(name = "event_participant_detail")
 @Data
 public class EventParticipantDetail {
 	
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
 	@OneToOne

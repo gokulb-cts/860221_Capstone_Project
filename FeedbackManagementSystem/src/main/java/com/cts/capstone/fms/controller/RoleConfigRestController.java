@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.cts.capstone.fms.domain.Role;
+import com.cts.capstone.fms.dto.RoleDto;
 import com.cts.capstone.fms.service.RoleService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -50,11 +53,11 @@ public class RoleConfigRestController {
 	}
 	
 	@PostMapping(value = ROLE_END_POINT, produces = MediaType.APPLICATION_STREAM_JSON_VALUE ) 
-	public Mono<ResponseEntity<Object>> addRole(@RequestBody Role role) {
-		log.info("addRole()" + role);
+	public Mono<ResponseEntity<Object>> addRole(@RequestBody RoleDto roleDto) {
+		log.info("addRole()" + roleDto);
 		ServletUriComponentsBuilder uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
 		
-		return roleService.saveRole(role)
+		return roleService.saveRole(roleDto)
 						   .map(savedRole -> 
 				   					{
 										URI location = 
@@ -66,5 +69,25 @@ public class RoleConfigRestController {
 									})
 						   .defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
 	}
+	
+	@PatchMapping(value = ROLE_END_POINT + "/{roleId}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
+	public Mono<ResponseEntity<Role>> updateRole(@PathVariable Long roleId, @RequestBody RoleDto roleDto) {
+ 
+		log.info("updateRole()" + roleId);
+
+		return roleService.updateRole(roleId, roleDto)
+				.map(updatedRole -> new ResponseEntity<>(updatedRole, HttpStatus.OK))
+				.defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+
+	}
+
+	@DeleteMapping(value = ROLE_END_POINT + "/{roleId}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
+	public void deleteRole(@PathVariable Long roleId) {
+		
+		log.info("deleteRole()" + roleId);
+		
+		roleService.deleteRole(roleId);
+	}
+	
 	
 }

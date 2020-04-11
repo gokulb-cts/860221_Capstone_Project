@@ -10,7 +10,9 @@ public interface EventService {
 	
 	public Mono<Event> saveEvent(EventDto eventDto);
 	
-	public Flux<Event> getEvents();
+	public Flux<Event> getEvents(int page, int limit);
+	
+	public Flux<Event> getAllEvents();
 	
 	public Mono<Event> getEventByEventId(String eventId);
 

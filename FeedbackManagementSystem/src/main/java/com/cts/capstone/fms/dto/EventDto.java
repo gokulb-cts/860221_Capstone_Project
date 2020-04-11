@@ -1,6 +1,7 @@
 package com.cts.capstone.fms.dto;
 
 import java.util.Date;
+import java.util.Set;
 
 import javax.validation.constraints.NotNull;
 
@@ -9,6 +10,8 @@ import lombok.Data;
 @Data
 public class EventDto {
 
+	private Long id;
+	
 	@NotNull(message = "Event Id is empty or missing")
 	private String eventId;
 	
@@ -46,6 +49,6 @@ public class EventDto {
 	private String status;
 	
 	@NotNull(message = "POC User ID is missing/empty")
-	private String pocUserId;
+	private Set<String> pocUserIds;
 	
 }

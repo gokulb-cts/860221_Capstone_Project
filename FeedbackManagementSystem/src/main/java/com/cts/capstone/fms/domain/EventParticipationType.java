@@ -1,20 +1,23 @@
 package com.cts.capstone.fms.domain;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 
-@Table(name = "event_participation_type")
 @Entity
+@Table(name = "event_participation_type")
 @Data
 public class EventParticipationType {
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@NotNull(message = "Participation Type Name is missing/empty")
+	@Column(nullable = false)
 	private String name;
 
 	private String description;

@@ -16,6 +16,7 @@ public class FmsUserDto {
 	@NotNull(message = "EmailID is empty/missing")	
 	private String emailId;
 	
+	@NotNull(message = "Password is empty/missing")	
 	private String password;
 	
 	private String mobileNumber;

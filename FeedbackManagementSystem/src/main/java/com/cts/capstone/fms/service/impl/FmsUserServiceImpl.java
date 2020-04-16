@@ -2,13 +2,12 @@ package com.cts.capstone.fms.service.impl;
 
 import static com.cts.capstone.fms.constants.FmsUserConstants.ROLE_NOT_FOUND;
 
-import java.util.ArrayList;
-
+import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -17,9 +16,11 @@ import org.springframework.stereotype.Service;
 import com.cts.capstone.fms.domain.FmsUser;
 import com.cts.capstone.fms.domain.Role;
 import com.cts.capstone.fms.dto.FmsUserDto;
+import com.cts.capstone.fms.dto.FmsUserRegisterDto;
 import com.cts.capstone.fms.exception.RoleNotFoundException;
 import com.cts.capstone.fms.repositories.FmsUserRepository;
 import com.cts.capstone.fms.repositories.RoleRepository;
+import com.cts.capstone.fms.security.UserPrincipal;
 import com.cts.capstone.fms.service.FmsUserService;
 import com.cts.capstone.fms.service.RoleService;
 
@@ -63,12 +64,16 @@ public class FmsUserServiceImpl implements FmsUserService {
 	}
 
 	@Override
-	public Mono<FmsUser> saveUser(FmsUserDto userDto) {
-
-		if (fmsUserRepository.findByUserId(userDto.getUserId()) != null) {
+	public Mono<FmsUser> saveUser(FmsUserRegisterDto userDto) {
+		
+		FmsUser user = fmsUserRepository.findByUserId(userDto.getUserId());
+		if (user != null && user.getEncryptedPassword() != null) {
 			throw new RuntimeException("User already exists with user ID: " + userDto.getUserId());
 		}
-		FmsUser user = new ModelMapper().map(userDto, FmsUser.class);
+		ModelMapper modelMapper = new ModelMapper();
+		modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull())
+									  .setMatchingStrategy(MatchingStrategies.STRICT);
+		modelMapper.map(userDto, user);
 		user.setEncryptedPassword(bCryptPasswordEncoder.encode(userDto.getPassword()));
 		return Mono.just(fmsUserRepository.save(user));
 
@@ -78,7 +83,10 @@ public class FmsUserServiceImpl implements FmsUserService {
 	public Mono<FmsUser> updateUser(Long userId, FmsUserDto userDto) {
 		FmsUser user = fmsUserRepository.findByUserId(userId);
 		if (user != null) {
-			user = new ModelMapper().map(userDto, FmsUser.class);
+			ModelMapper modelMapper = new ModelMapper();
+			modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT)
+										  .setPropertyCondition(Conditions.isNotNull());
+			modelMapper.map(userDto, user);
 			if (userDto.getPassword() != null)
 				user.setEncryptedPassword(bCryptPasswordEncoder.encode(userDto.getPassword()));
 			return Mono.just(fmsUserRepository.save(user));
@@ -112,6 +120,18 @@ public class FmsUserServiceImpl implements FmsUserService {
 					});
 				});
 	}
+	
+
+	@Override
+	public Mono<FmsUser> removeUserRole(Long userId) {
+		FmsUser user = fmsUserRepository.findByUserId(userId);
+		if(user != null) {
+			user.setRole(null);
+			return Mono.just(fmsUserRepository.save(user));
+		}
+		
+		return Mono.empty();
+	}
 
 	@Override
 	public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
@@ -121,12 +141,11 @@ public class FmsUserServiceImpl implements FmsUserService {
 		if (fmsUser == null)
 			throw new UsernameNotFoundException(userId);
 
-		return new User(String.valueOf(fmsUser.getUserId()), fmsUser.getEncryptedPassword(), new ArrayList<>()); // User
-																													// class
-																													// of
-																													// Spring
-																													// core
-
+		//return new User(String.valueOf(fmsUser.getUserId()), fmsUser.getEncryptedPassword(), new ArrayList<>());
+		//Adding Authority checks 
+		
+		return new UserPrincipal(fmsUser); //UserPrincipal - custom class that implements Spring's UserDetails class
+		
 	}
 
 }

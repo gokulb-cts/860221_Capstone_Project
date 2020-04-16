@@ -18,6 +18,8 @@ public class EventDto {
 	@NotNull(message = "Event Name is empty or missing")
 	private String eventName;
 	
+	private String month;
+	
 	private String eventDescription;
 	
 	private Date eventDate;
@@ -48,7 +50,7 @@ public class EventDto {
 	
 	private String status;
 	
-	@NotNull(message = "POC User ID is missing/empty")
-	private Set<String> pocUserIds;
+	@NotNull(message = "POC Details is missing/empty")
+	private Set<FmsUserDto> pocUsers;
 	
 }

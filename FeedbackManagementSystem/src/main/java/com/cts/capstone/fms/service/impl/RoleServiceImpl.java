@@ -3,6 +3,7 @@ package com.cts.capstone.fms.service.impl;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +38,9 @@ public class RoleServiceImpl implements RoleService {
 
 	@Override
 	public Mono<Role> saveRole(RoleDto roleDto) {
-		Role role = new ModelMapper().map(roleDto, Role.class);
+		ModelMapper modelMapper = new ModelMapper();
+		modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+		Role role = modelMapper.map(roleDto, Role.class);
 		return Mono.justOrEmpty(roleRepository.save(role));
 	}
 
@@ -48,7 +51,9 @@ public class RoleServiceImpl implements RoleService {
 		
 		if(roleOp.isPresent()) {
 			Role role = roleOp.get();
-			role = new ModelMapper().map(roleDto, Role.class);
+			ModelMapper modelMapper = new ModelMapper();
+			modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+			role = modelMapper.map(roleDto, Role.class);
 			return Mono.just(roleRepository.save(role));
 		}
 		return Mono.empty();

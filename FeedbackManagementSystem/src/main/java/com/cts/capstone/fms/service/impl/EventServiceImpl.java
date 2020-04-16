@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,7 +14,8 @@ import com.cts.capstone.fms.domain.Event;
 import com.cts.capstone.fms.domain.FmsUser;
 import com.cts.capstone.fms.domain.Role;
 import com.cts.capstone.fms.dto.EventDto;
-import com.cts.capstone.fms.enums.Authority;
+import com.cts.capstone.fms.dto.FmsUserDto;
+import com.cts.capstone.fms.enums.RoleEnum;
 import com.cts.capstone.fms.repositories.EventRepository;
 import com.cts.capstone.fms.repositories.FmsUserRepository;
 import com.cts.capstone.fms.repositories.RoleRepository;
@@ -36,16 +38,20 @@ public class EventServiceImpl implements EventService {
 	
 	@Override
 	public Mono<Event> saveEvent(EventDto eventDto) {
-		Event event  = new ModelMapper().map(eventDto, Event.class);
+		ModelMapper modelMapper = new ModelMapper();
 		
-		Set<FmsUser> users = this.getUsers(eventDto.getPocUserIds());
+		modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+		
+		Event event  = modelMapper.map(eventDto, Event.class);
+		
+		Set<FmsUser> users = this.getUsers(eventDto.getPocUsers());
 		
 		//Add Poc role to Poc users
 		for(FmsUser user : users) {
 			Role userRole = user.getRole();
 			if(userRole == null || 
-					(userRole != null && !userRole.getRoleName().equalsIgnoreCase(Authority.POC.toString()))) {
-				userRole = roleRepository.findByRoleNameIgnoreCase(Authority.POC.toString());
+					(userRole != null && !userRole.getRoleName().equalsIgnoreCase(RoleEnum.ROLE_POC.toString()))) {
+				userRole = roleRepository.findByRoleNameIgnoreCase(RoleEnum.ROLE_POC.toString());
 			}
 			user.setRole(userRole);
 		}
@@ -53,15 +59,14 @@ public class EventServiceImpl implements EventService {
 		return Mono.just(eventRepository.save(event));
 	}
 
-	private Set<FmsUser> getUsers(Set<String> userIds) {
+	private Set<FmsUser> getUsers(Set<FmsUserDto> userDtoList) {
 		Set<FmsUser> users = new HashSet<FmsUser>();
-		for(String userIdStr : userIds) {
-			Long userId = Long.parseLong(userIdStr);
-			FmsUser user = userRepository.findByUserId(userId);
+		ModelMapper modelMapper = new ModelMapper();
+		modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+		for(FmsUserDto userDto : userDtoList) {
+			FmsUser user = userRepository.findByUserId(userDto.getUserId());
 			if(user == null) {
-				user = new FmsUser();
-				user.setUserId(userId);
-				user.setUserName(userIdStr);
+				user = modelMapper.map(userDto, FmsUser.class);
 			}
 			users.add(user);
 		}
@@ -81,7 +86,7 @@ public class EventServiceImpl implements EventService {
 	
 	@Override
 	public Mono<Event> getEventByEventId(String eventId) {
-		return Mono.just(eventRepository.findByEventId(eventId));
+		return Mono.justOrEmpty(eventRepository.findByEventId(eventId));
 	}
 	
 }

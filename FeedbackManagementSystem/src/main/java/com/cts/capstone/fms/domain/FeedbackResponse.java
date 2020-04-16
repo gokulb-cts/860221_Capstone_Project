@@ -5,22 +5,35 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import lombok.Data;
 
-@Entity
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Entity(name = "feedback_response")
 @Table(name = "feedback_response")
-@Data
+@Getter
+@Setter
 public class FeedbackResponse {
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
+	@JsonBackReference
+	@ManyToOne
+	@JoinColumn(name = "event_feedback_id")
+	private EventFeedback eventFeedback;
+
+	@JsonBackReference
 	@OneToOne
 	@JoinColumn(name = "question_id")
 	private FeedbackQuestion question;
 	
-	private String feedbackAnswer;
+	private String answerText;
 	
 }

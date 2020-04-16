@@ -17,6 +17,9 @@ public class EventFeedbackDto {
 	@NotNull(message = "User ID is empty/missing")
 	private Long userId;
 	
+	@NotNull(message = "Participation Type ID is empty/missing")
+	private Long participationTypeId;
+	
 	private List<FeedbackResponseDto> feedbackResponse;
 
 	private Integer rating;

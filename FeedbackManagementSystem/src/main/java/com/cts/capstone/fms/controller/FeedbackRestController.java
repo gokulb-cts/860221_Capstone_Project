@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -42,6 +43,9 @@ public class FeedbackRestController {
 	@Autowired
 	private FeedbackService feedbackService;
 
+	
+	//Get Feedback Questions
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping(value = QUESTION_END_POINT, produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Flux<FeedbackQuestion> getFeedbackQuestions(@RequestParam(value = "page", defaultValue = "0") int page,
 			@RequestParam(value = "limit", defaultValue = "25") int limit) {
@@ -52,16 +56,22 @@ public class FeedbackRestController {
 
 	}
 
+	
+	//Get Feedback Question by ID
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping(value = QUESTION_END_POINT + "/{questionId}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
-	public Mono<ResponseEntity<FeedbackQuestion>> getUserByUserId(@PathVariable Long questionId) {
+	public Mono<ResponseEntity<FeedbackQuestion>> getFeedbackQuestionById(@PathVariable Long questionId) {
 
-		log.info("getUserByUserId()");
+		log.info("getFeedbackQuestionById()");
 		return feedbackService.getFeedbackQuestionByQuestionId(questionId)
 				.map(question -> new ResponseEntity<FeedbackQuestion>(question, HttpStatus.OK))
 				.defaultIfEmpty(new ResponseEntity<FeedbackQuestion>(HttpStatus.NOT_FOUND));
 
 	}
 
+	
+	//Add New Question
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping(value = QUESTION_END_POINT, produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Mono<ResponseEntity<Object>> addQuestion(@Valid @RequestBody FeedbackQuestionDto questionDto) {
 		log.info("addQuestion()" + questionDto);
@@ -74,6 +84,9 @@ public class FeedbackRestController {
 		}).defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
 	}
 
+	
+	//Update Question
+	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping(value = QUESTION_END_POINT + "/{questionId}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Mono<ResponseEntity<FeedbackQuestion>> updateFeedbackQuestion(@PathVariable Long questionId,
 			@RequestBody FeedbackQuestionDto feedQuestionDto) {
@@ -86,6 +99,9 @@ public class FeedbackRestController {
 
 	}
 
+	
+	//Delete Question
+	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping(value = QUESTION_END_POINT + "/{questionId}")
 	public void deleteFeedbackQuestion(@PathVariable Long questionId) {
 
@@ -94,6 +110,9 @@ public class FeedbackRestController {
 
 	}
 
+	
+	//Delete Answer
+	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping(value = ANSWER_END_POINT + "/{questionId}")
 	public void deleteFeedbackAnswer(@PathVariable Long answerId) {
 
@@ -102,6 +121,9 @@ public class FeedbackRestController {
 
 	}
 	
+	
+	//Update Answer
+	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping(value = ANSWER_END_POINT + "/{answerId}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Mono<ResponseEntity<FeedbackAnswer>> updateFeedbackAnswer(@PathVariable Long answerId,
 			@RequestBody FeedbackAnswerDto feedbackAnswerDto) {
@@ -113,6 +135,8 @@ public class FeedbackRestController {
 				.defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 	
+	
+	//Save Feedback From Participant
 	@PostMapping(value = FEEDBACK_END_POINT, produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Mono<ResponseEntity<Object>> saveFeedback(@Valid @RequestBody EventFeedbackDto eventFeedbackDto) {
 		log.info("saveFeedback()" + eventFeedbackDto);

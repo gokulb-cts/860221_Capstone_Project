@@ -6,6 +6,6 @@ public class FeedbackConfigConstants {
 	
 	public static final String ANSWER_END_POINT = "/answers";
 	
-	public static final String FEEDBACK_END_POINT = "feedbacks";
+	public static final String FEEDBACK_END_POINT = "/feedbacks";
 	
 }

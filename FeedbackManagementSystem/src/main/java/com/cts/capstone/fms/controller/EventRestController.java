@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,12 +31,16 @@ import reactor.core.publisher.Mono;;
 
 @RestController
 @Slf4j
+@PreAuthorize("isAuthenticated()")
 @RequestMapping("/api/v1")
 public class EventRestController {
 
 	@Autowired
 	private EventService eventService;
 
+	
+	//Get All Events
+	@PreAuthorize("hasAnyRole('ADMIN','PMO')")
 	@GetMapping(value = EVENT_END_POINT, produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Flux<Event> getAllEvents(@RequestParam(value = "page", defaultValue = "0") int page,
 			@RequestParam(value = "limit", defaultValue = "25") int limit) {
@@ -44,13 +50,18 @@ public class EventRestController {
 		return eventService.getEvents(page, limit);
 	}
 
+	
+	//Get Event By Event ID
 	@GetMapping(value = EVENT_END_POINT + "/{eventId}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
-	public Mono<ResponseEntity<Event>> getEventByEventId(@PathVariable String eventId) {
+	public Mono<ResponseEntity<Event>> getEventByEventId(@PathVariable String eventId, Authentication auth) {
 		log.info("getEventByEventId()");
 		return eventService.getEventByEventId(eventId).map(event -> new ResponseEntity<Event>(event, HttpStatus.OK))
 				.defaultIfEmpty(new ResponseEntity<Event>(HttpStatus.NOT_FOUND));
 	}
 
+	
+	//Add New Event
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping(value = EVENT_END_POINT, produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Mono<ResponseEntity<Object>> addEvent(@Valid @RequestBody EventDto eventDto) {
 		log.info("saveEvent()" + eventDto);

@@ -8,3 +8,17 @@ spring :
 server :
   servlet :
     context-path : /fms
+    
+fms :
+  participation :
+    type :
+      registered : Registered
+      attended : Participated
+      unattended : Not Participated
+      unregistered : UnRegistered
+  import :
+    file-path :  
+      event-info-list : F:\Training\Excel\OutReach-Event Summary.xlsx
+      volunteer-attended-list : F:\Training\Excel\OutReach-Event Information.xlsx
+      volunteer-unattended-list : F:\Training\Excel\Voluntary Enrollment Details - Not Attended.xlsx
+      volunteer-unregistered-list :  F:\Training\Excel\Voluntary Enrollment Details - UnRegistered.xlsx     

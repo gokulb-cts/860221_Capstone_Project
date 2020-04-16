@@ -5,25 +5,29 @@ import static com.cts.capstone.fms.security.constants.SecurityConstants.SIGN_UP_
 
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import com.cts.capstone.fms.repositories.FmsUserRepository;
 import com.cts.capstone.fms.service.FmsUserService;
 
 import lombok.AllArgsConstructor;
 
 /** To Authorize and Authenticate requests **/
 
+@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 @EnableWebSecurity
 @AllArgsConstructor
 public class FmsWebSecurity extends WebSecurityConfigurerAdapter {
 
 	private final FmsUserService userService;
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
-
+	private final FmsUserRepository userRepository;
+	
 	// For authentication service to authenticate request
 	@Override
 	public void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -46,7 +50,7 @@ public class FmsWebSecurity extends WebSecurityConfigurerAdapter {
 				.anyRequest() // for any other request
 				.authenticated() // do authentication
 				.and().addFilter(getAuthenticaitonFilter()) // Add Authentication Filter
-				.addFilter(new AuthorizationFilter(authenticationManager())).sessionManagement()
+				.addFilter(new AuthorizationFilter(authenticationManager(), userRepository)).sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 	}
 

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -28,30 +29,43 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @Slf4j
+@PreAuthorize("isAuthenticated()")
 @RequestMapping("/api/v1")
 public class RoleConfigRestController {
 	
 	@Autowired
 	public RoleService roleService; 
 	
+	
+	//Get All Roles
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping(value= ROLE_END_POINT, produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Flux<Role> getAllRoles() {
 		log.info("getAllRoles()");
 		return roleService.getAllRoles();
 	}
 	
+	
+	//Get Role by Role ID
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping(value = ROLE_END_POINT + "/{roleId}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE )
 	public Mono<Role> getRoleByRoleId(@PathVariable Long roleId) {
 		log.info("getRoleByRoleId()");
 		return roleService.getRoleByRoleId(roleId);
 	}
-		
+	
+	
+	//Get Role by Role Name
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping(value = ROLE_END_POINT + "/{roleName}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE )
 	public Mono<Role> getRoleByRoleName(@PathVariable String roleName) {
 		log.info("getRoleByRoleName()");
 		return roleService.getRoleByRoleName(roleName);
 	}
 	
+	
+	//Add New Role
+	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping(value = ROLE_END_POINT, produces = MediaType.APPLICATION_STREAM_JSON_VALUE ) 
 	public Mono<ResponseEntity<Object>> addRole(@RequestBody RoleDto roleDto) {
 		log.info("addRole()" + roleDto);
@@ -70,6 +84,9 @@ public class RoleConfigRestController {
 						   .defaultIfEmpty(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
 	}
 	
+	
+	//Update Role
+	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping(value = ROLE_END_POINT + "/{roleId}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Mono<ResponseEntity<Role>> updateRole(@PathVariable Long roleId, @RequestBody RoleDto roleDto) {
  
@@ -81,6 +98,9 @@ public class RoleConfigRestController {
 
 	}
 
+	
+	//Delete Role
+	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping(value = ROLE_END_POINT + "/{roleId}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public void deleteRole(@PathVariable Long roleId) {
 		

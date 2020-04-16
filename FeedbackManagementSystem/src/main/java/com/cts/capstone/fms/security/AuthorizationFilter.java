@@ -5,7 +5,6 @@ import static com.cts.capstone.fms.security.constants.SecurityConstants.TOKEN_PR
 import static com.cts.capstone.fms.security.constants.SecurityConstants.TOKEN_SECRET;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -17,12 +16,18 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
+import com.cts.capstone.fms.domain.FmsUser;
+import com.cts.capstone.fms.repositories.FmsUserRepository;
+
 import io.jsonwebtoken.Jwts;
 
 public class AuthorizationFilter extends BasicAuthenticationFilter {
 
-	public AuthorizationFilter(AuthenticationManager authenticationManager) {
+	private final FmsUserRepository userRepository;
+	
+	public AuthorizationFilter(AuthenticationManager authenticationManager, FmsUserRepository userRepository) {
 		super(authenticationManager);
+		this.userRepository = userRepository;
 	}
 
 	@Override
@@ -60,7 +65,13 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
 							  .getSubject();
 			
 			if(user != null) {
-				return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
+				FmsUser fmsUser = userRepository.findByUserId(Long.valueOf(user));
+				
+				if(fmsUser == null) return null;
+				
+				UserPrincipal userPrincipal = new UserPrincipal(fmsUser);
+				
+				return new UsernamePasswordAuthenticationToken(userPrincipal, null, userPrincipal.getAuthorities());
 			}
 		}
 		return null;

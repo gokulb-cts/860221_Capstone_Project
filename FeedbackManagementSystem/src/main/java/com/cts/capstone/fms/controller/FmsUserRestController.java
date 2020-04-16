@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -24,6 +25,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.cts.capstone.fms.domain.FmsUser;
 import com.cts.capstone.fms.dto.FmsUserDto;
+import com.cts.capstone.fms.dto.FmsUserRegisterDto;
 import com.cts.capstone.fms.exception.RoleNotFoundException;
 import com.cts.capstone.fms.service.FmsUserService;
 import com.cts.capstone.fms.service.RoleService;
@@ -34,6 +36,7 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @Slf4j
+@PreAuthorize("isAuthenticated()")
 @RequestMapping("/api/v1")
 public class FmsUserRestController {
 
@@ -43,6 +46,9 @@ public class FmsUserRestController {
 	@Autowired
 	private RoleService roleService;
 
+	
+	//Get All Users
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping(value = USER_END_POINT, produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Flux<FmsUser> getAllUsers(@RequestParam(value = "page", defaultValue = "0") int page,
 			@RequestParam(value = "limit", defaultValue = "25") int limit) {
@@ -53,6 +59,9 @@ public class FmsUserRestController {
 
 	}
 
+	
+	//Get User By UserId
+	@PreAuthorize("hasRole('ADMIN') or #userId == principal.userId")
 	@GetMapping(value = USER_END_POINT + "/{userId}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Mono<ResponseEntity<FmsUser>> getUserByUserId(@PathVariable Long userId) {
 
@@ -62,6 +71,9 @@ public class FmsUserRestController {
 
 	}
 
+	
+	//Get User By MailId
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping(value = USER_END_POINT + "/by", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Mono<ResponseEntity<FmsUser>> getUserByEmailId(@RequestParam("email") String emailId) {
 
@@ -71,6 +83,9 @@ public class FmsUserRestController {
 
 	}
 
+	
+	//Get List of Users By Role
+	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping(value = USER_END_POINT + "/role/{roleName}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Flux<ResponseEntity<FmsUser>> getUsersByRole(@PathVariable String roleName) {
 
@@ -99,8 +114,10 @@ public class FmsUserRestController {
 
 	}
 
+	
+	//Add New User (Register User)
 	@PostMapping(value = USER_END_POINT, produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
-	public Mono<ResponseEntity<Object>> addUser(@Valid @RequestBody FmsUserDto userDto) {
+	public Mono<ResponseEntity<Object>> addUser(@Valid @RequestBody FmsUserRegisterDto userDto) {
 
 		log.info("registerUser()" + userDto);
 		ServletUriComponentsBuilder uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
@@ -112,6 +129,9 @@ public class FmsUserRestController {
 
 	}
 
+	
+	//Update User Details
+	@PreAuthorize("hasRole('ADMIN') or #userId == principal.userId")
 	@PatchMapping(value = USER_END_POINT + "/{userId}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Mono<ResponseEntity<FmsUser>> updateUser(@PathVariable Long userId, @RequestBody FmsUserDto userDto) {
 
@@ -123,6 +143,9 @@ public class FmsUserRestController {
 
 	}
 
+	
+	//Assign Role to User
+	@PreAuthorize("hasRole('ADMIN')")
 	@PatchMapping(value = USER_END_POINT
 			+ "/{userId}/role/{roleName}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Mono<ResponseEntity<FmsUser>> assignUserRole(@PathVariable Long userId, @PathVariable String roleName) {
@@ -134,7 +157,25 @@ public class FmsUserRestController {
 				.defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
 	}
+	
+	
+	//Remove Role of the User
+	@PreAuthorize("hasRole('ADMIN')")
+	@DeleteMapping(value = USER_END_POINT
+			+ "/{userId}/role", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
+	public Mono<ResponseEntity<FmsUser>> removeUserRole(@PathVariable Long userId) {
 
+		log.info("removeUserRole()");
+
+		return fmsUserService.removeUserRole(userId)
+				.map(updatedUser -> new ResponseEntity<>(updatedUser, HttpStatus.OK))
+				.defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+
+	}
+
+
+	//Delete User	
+	@PreAuthorize("hasRole('ADMIN') or #userId == principal.userId")
 	@DeleteMapping(value = USER_END_POINT + "/{userId}")
 	public void deleteUser(@PathVariable Long userId) {
 
@@ -142,4 +183,5 @@ public class FmsUserRestController {
 		fmsUserService.deleteUser(userId);
 
 	}
+	
 }

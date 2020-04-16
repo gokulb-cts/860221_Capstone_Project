@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -68,6 +70,7 @@ public class FeedbackServiceImpl implements FeedbackService {
 	public Mono<FeedbackQuestion> saveFeedbackQuestion(FeedbackQuestionDto questionDto) {
 
 		ModelMapper modelMapper = new ModelMapper();
+		modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 		FeedbackQuestion question = modelMapper.map(questionDto, FeedbackQuestion.class);
 
 		// Set Participation Status
@@ -92,7 +95,7 @@ public class FeedbackServiceImpl implements FeedbackService {
 				return answer;
 			}).collect(Collectors.toList());
 
-			question.setAnswers(feedbackAnswers);
+			question.setAnswerList(feedbackAnswers);
 		}
 
 		return Mono.justOrEmpty(feedbackQuestionRepository.save(question));
@@ -117,10 +120,13 @@ public class FeedbackServiceImpl implements FeedbackService {
 		
 		if (question.isPresent()) {
 			FeedbackQuestion feedbackQuestion = question.get();
-			feedbackQuestion = new ModelMapper().map(questionDto, FeedbackQuestion.class);
+			ModelMapper modelMapper = new ModelMapper();
+			modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull())
+										  .setMatchingStrategy(MatchingStrategies.STRICT);
+			modelMapper.map(questionDto, feedbackQuestion);
 
 			//Set Event Participation Type
-			if (!question.get().getEventParticipationType().getName()
+			if (questionDto.getParticipationStatusType() != null && !question.get().getEventParticipationType().getName()
 					.equalsIgnoreCase(questionDto.getParticipationStatusType())) {
 
 				EventParticipationType participationStatusType = participationStatusTypeRepository
@@ -136,6 +142,16 @@ public class FeedbackServiceImpl implements FeedbackService {
 
 			}
 			
+			//Set Answers
+			if(questionDto.getAnswers() != null) {
+				List<FeedbackAnswer> feedbackAnswers = questionDto.getAnswers().stream().map(answerDto -> {
+					FeedbackAnswer answer = modelMapper.map(answerDto, FeedbackAnswer.class);
+					answer.setFeedbackQuestion(feedbackQuestion);
+					return answer;
+				}).collect(Collectors.toList());
+				feedbackQuestion.setAnswerList(feedbackAnswers);
+			}
+			
 			return Mono.just(feedbackQuestionRepository.save(feedbackQuestion));
 		}
 
@@ -149,8 +165,10 @@ public class FeedbackServiceImpl implements FeedbackService {
 		Optional<FeedbackAnswer> answerOp = feedbackAnswerRepository.findById(answerId);
 		
 		if(answerOp.isPresent()) {
+			ModelMapper modelMapper = new ModelMapper();
+			modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 			FeedbackAnswer answer = answerOp.get();
-			answer = new ModelMapper().map(feedbackAnswerDto, FeedbackAnswer.class);
+			answer = modelMapper.map(feedbackAnswerDto, FeedbackAnswer.class);
 			return Mono.just(feedbackAnswerRepository.save(answer));
 		}
 		return Mono.empty();
@@ -173,12 +191,13 @@ public class FeedbackServiceImpl implements FeedbackService {
 	public Mono<EventFeedback> saveFeedback(EventFeedbackDto eventFeedbackDto) {
 		
 		ModelMapper modelMapper = new ModelMapper();
+		modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
 		EventFeedback eventFeedback = modelMapper.map(eventFeedbackDto, EventFeedback.class);
 
 		// Set Event
 		if (!StringUtils.isEmpty(eventFeedbackDto.getEventId())) {
 			Event event = eventRepository.findByEventId(eventFeedbackDto.getEventId());
-			if (event != null) {
+			if (event == null) {
 				throw new RuntimeException("Event not found with Event ID : " + eventFeedbackDto.getEventId());
 			}
 			eventFeedback.setEvent(event);
@@ -187,12 +206,20 @@ public class FeedbackServiceImpl implements FeedbackService {
 		// Set User
 		if (eventFeedbackDto.getUserId() != null && eventFeedbackDto.getUserId() != 0) {
 			FmsUser user = userRepository.findByUserId(eventFeedbackDto.getUserId());
-			if (user != null) {
+			if (user == null) {
 				throw new RuntimeException("User not found with User ID : " + eventFeedbackDto.getUserId());
 			}
 			eventFeedback.setUser(user);
 		}
 
+		//Set Participation Type
+		if (eventFeedbackDto.getParticipationTypeId() != null && eventFeedbackDto.getParticipationTypeId() != 0) {
+			Optional<EventParticipationType> participationTypeOp = participationStatusTypeRepository.findById(eventFeedbackDto.getParticipationTypeId());
+			if (!participationTypeOp.isPresent()) {
+				throw new RuntimeException("Participation Status not found with Participation ID : " + eventFeedbackDto.getParticipationTypeId());
+			}
+			eventFeedback.setParticipationStatus(participationTypeOp.get());
+		}
 		
 		// Add Feedback Response 
 		if (!eventFeedbackDto.getFeedbackResponse().isEmpty()) {
@@ -200,6 +227,7 @@ public class FeedbackServiceImpl implements FeedbackService {
 				FeedbackResponse feedbackResponse = modelMapper.map(feedbackResDto, FeedbackResponse.class);
 				FeedbackQuestion feedbackQuestion = feedbackQuestionRepository.findById(feedbackResDto.getQuestionId()).get();
 				feedbackResponse.setQuestion(feedbackQuestion);
+				feedbackResponse.setEventFeedback(eventFeedback);
 				return feedbackResponse;
 			}).collect(Collectors.toList());
 

@@ -17,11 +17,13 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "feedback_question")
-@Data
+@Getter
+@Setter
 @JsonIgnoreProperties(value = {"createdBy","createdDate","modifiedBy","lastModifiedDate"}, allowSetters = true)
 public class FeedbackQuestion {
 	@Id
@@ -41,12 +43,12 @@ public class FeedbackQuestion {
 	
 	private Date lastModifiedDate; 
 	
-	@OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.DETACH ,CascadeType.REFRESH})
+	@OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST,CascadeType.REFRESH})
 	@JoinColumn(name = "participationTypeId")
 	private EventParticipationType eventParticipationType;
 	
 	@OneToMany(mappedBy = "feedbackQuestion", cascade = CascadeType.ALL)
 	@JsonManagedReference
- 	private List<FeedbackAnswer> answers;	
+ 	private List<FeedbackAnswer> answerList;	
 
 }

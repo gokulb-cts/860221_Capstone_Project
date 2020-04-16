@@ -5,7 +5,7 @@ import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class FmsUserDto {
+public class FmsUserRegisterDto {
 	
 	@NotNull(message = "User ID is empty/missing")
 	private Long userId;

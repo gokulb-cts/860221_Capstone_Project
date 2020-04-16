@@ -1,5 +1,6 @@
 package com.cts.capstone.fms.domain;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -23,13 +24,21 @@ public class EventParticipantDetail {
 	@JoinColumn(name="event_id")
 	private Event event;
 	
-	@OneToOne
-	@JoinColumn(name="user_id")
+	@OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
+	@JoinColumn(name="userId", referencedColumnName = "userId")
 	private FmsUser participant;
 	
-	@OneToOne
+	private int volunteerHours;
+	
+	private int travelHours;
+	
+	@OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE})
 	@JoinColumn(name= "participation_status_id")
 	private EventParticipationType participationStatus;
+	
+	private String businessUnit;
+	
+	private String iiepCategory;
 	
 	private byte feedbackMailSentStatus; 
 

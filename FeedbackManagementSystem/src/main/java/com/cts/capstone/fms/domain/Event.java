@@ -17,13 +17,17 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name="event")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Event implements Serializable {
@@ -39,6 +43,8 @@ public class Event implements Serializable {
 	
 	@Column(nullable = false, unique = true)
 	private String eventName;
+	
+	private String month;
 	
 	private String eventDescription;
 	
@@ -73,8 +79,16 @@ public class Event implements Serializable {
 	@ManyToMany(cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH })
 	@JoinTable(name = "event_poc_user", joinColumns = @JoinColumn(name = "eventId"), inverseJoinColumns = @JoinColumn(name = "userId"))
 	private Set<FmsUser> pocUser;
-	
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "event")
+
+	@JsonManagedReference
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "event")
 	private List<EventFeedback> eventFeedbackList;
+	
+	//Method to check if the poc user 
+	public boolean hasEventWithPocUserId(Long pocUserId) {
+		return this.getPocUser()
+				.stream()
+				.anyMatch(user -> user.getUserId() == pocUserId);
+	}
 
 }

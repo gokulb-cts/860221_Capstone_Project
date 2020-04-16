@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @PreAuthorize("isAuthenticated()")
 @RequestMapping("/api/v1")
-public class EventDetailImportController {
+public class EventDetailRestImportController {
 
 	@Autowired
 	private EventsImportService eventsImportService;

@@ -66,7 +66,7 @@ public class FmsUserRestController {
 	public Mono<ResponseEntity<FmsUser>> getUserByUserId(@PathVariable Long userId) {
 
 		log.info("getUserByUserId()");
-		return fmsUserService.getUserByUserId(userId).map(event -> new ResponseEntity<FmsUser>(event, HttpStatus.OK))
+		return fmsUserService.getUserByUserId(userId).map(user -> new ResponseEntity<FmsUser>(user, HttpStatus.OK))
 				.defaultIfEmpty(new ResponseEntity<FmsUser>(HttpStatus.NOT_FOUND));
 
 	}
@@ -78,7 +78,7 @@ public class FmsUserRestController {
 	public Mono<ResponseEntity<FmsUser>> getUserByEmailId(@RequestParam("email") String emailId) {
 
 		log.info("getUserByEmailId()");
-		return fmsUserService.getUserByEmailId(emailId).map(event -> new ResponseEntity<FmsUser>(event, HttpStatus.OK))
+		return fmsUserService.getUserByEmailId(emailId).map(user -> new ResponseEntity<FmsUser>(user, HttpStatus.OK))
 				.defaultIfEmpty(new ResponseEntity<FmsUser>(HttpStatus.NOT_FOUND));
 
 	}

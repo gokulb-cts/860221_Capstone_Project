@@ -4,6 +4,8 @@ import static com.cts.capstone.fms.constants.RoleConstants.ROLE_END_POINT;
 
 import java.net.URI;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -67,7 +69,7 @@ public class RoleConfigRestController {
 	//Add New Role
 	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping(value = ROLE_END_POINT, produces = MediaType.APPLICATION_STREAM_JSON_VALUE ) 
-	public Mono<ResponseEntity<Object>> addRole(@RequestBody RoleDto roleDto) {
+	public Mono<ResponseEntity<Object>> addRole(@Valid @RequestBody RoleDto roleDto) {
 		log.info("addRole()" + roleDto);
 		ServletUriComponentsBuilder uriBuilder = ServletUriComponentsBuilder.fromCurrentRequest();
 		

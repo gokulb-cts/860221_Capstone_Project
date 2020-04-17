@@ -1,6 +1,7 @@
 package com.cts.capstone.fms.service;
 
 import com.cts.capstone.fms.domain.EventFeedback;
+import com.cts.capstone.fms.domain.EventParticipationType;
 import com.cts.capstone.fms.domain.FeedbackAnswer;
 import com.cts.capstone.fms.domain.FeedbackQuestion;
 import com.cts.capstone.fms.dto.EventFeedbackDto;
@@ -15,6 +16,8 @@ public interface FeedbackService {
 	public Flux<FeedbackQuestion> getFeedbackQuestions(int page, int limit);
 
 	public Mono<FeedbackQuestion> getFeedbackQuestionByQuestionId(Long questionId);
+	
+	public Mono<FeedbackQuestion> getFeedbackQuestionByParticipationType(EventParticipationType participationType);
 
 	public Mono<FeedbackQuestion> saveFeedbackQuestion(FeedbackQuestionDto questionDto);
 

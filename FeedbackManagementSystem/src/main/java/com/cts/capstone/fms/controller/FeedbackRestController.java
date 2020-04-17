@@ -38,6 +38,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @Slf4j
 @RequestMapping("/api/v1")
+@PreAuthorize("isAuthenticated()")
 public class FeedbackRestController {
 
 	@Autowired
@@ -137,6 +138,7 @@ public class FeedbackRestController {
 	
 	
 	//Save Feedback From Participant
+	@PreAuthorize("permitAll()")
 	@PostMapping(value = FEEDBACK_END_POINT, produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Mono<ResponseEntity<Object>> saveFeedback(@Valid @RequestBody EventFeedbackDto eventFeedbackDto) {
 		log.info("saveFeedback()" + eventFeedbackDto);

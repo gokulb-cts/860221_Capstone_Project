@@ -8,4 +8,6 @@ public class SecurityConstants {
 	public static final String SIGN_UP_URL = "/api/v1/users";
 	public static final String TOKEN_SECRET = "hq0wi7bnx0pe7yu";
 	public static final String LOG_IN_URL = "/api/v1/users/login";
+	public static final String FEEDBACK_RESPONSE_URL = "/api/v1/feedbacks";
+	
 }

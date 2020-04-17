@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity(name = "event_feedback")
+@Entity
 @Table(name = "event_feedback")
 @Getter
 @Setter

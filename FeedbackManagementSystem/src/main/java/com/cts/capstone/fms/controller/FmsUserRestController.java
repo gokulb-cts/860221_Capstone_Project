@@ -116,6 +116,7 @@ public class FmsUserRestController {
 
 	
 	//Add New User (Register User)
+	@PreAuthorize("permitAll()")
 	@PostMapping(value = USER_END_POINT, produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Mono<ResponseEntity<Object>> addUser(@Valid @RequestBody FmsUserRegisterDto userDto) {
 

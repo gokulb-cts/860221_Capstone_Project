@@ -85,7 +85,7 @@ public class FmsAppInitialDataSetup {
 			role = new Role();
 			role.setRoleName(roleName);
 			role.setRoleDescription(roleDescription);
-			//role.setAuthorityList(authorities);
+			role.setAuthorityList(authorities);
 			roleRepository.save(role);
 		}
 		

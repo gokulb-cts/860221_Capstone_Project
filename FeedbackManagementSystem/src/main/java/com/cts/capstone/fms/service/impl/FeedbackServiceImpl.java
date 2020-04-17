@@ -188,6 +188,13 @@ public class FeedbackServiceImpl implements FeedbackService {
 	}
 
 	@Override
+	public Mono<FeedbackQuestion> getFeedbackQuestionByParticipationType(EventParticipationType participationType) {
+		
+		return Mono.justOrEmpty(feedbackQuestionRepository.findByEventParticipationType(participationType));
+	
+	}
+	
+	@Override
 	public Mono<EventFeedback> saveFeedback(EventFeedbackDto eventFeedbackDto) {
 		
 		ModelMapper modelMapper = new ModelMapper();
@@ -225,8 +232,10 @@ public class FeedbackServiceImpl implements FeedbackService {
 		if (!eventFeedbackDto.getFeedbackResponse().isEmpty()) {
 			List<FeedbackResponse> feedbackResponses = eventFeedbackDto.getFeedbackResponse().stream().map(feedbackResDto -> {
 				FeedbackResponse feedbackResponse = modelMapper.map(feedbackResDto, FeedbackResponse.class);
-				FeedbackQuestion feedbackQuestion = feedbackQuestionRepository.findById(feedbackResDto.getQuestionId()).get();
-				feedbackResponse.setQuestion(feedbackQuestion);
+				Optional<FeedbackQuestion> feedbackQuestion = feedbackQuestionRepository.findById(feedbackResDto.getQuestionId());
+				if(!feedbackQuestion .isPresent()) 
+					throw new RuntimeException("Question with Question ID not found : " + feedbackResDto.getQuestionId());
+				feedbackResponse.setQuestion(feedbackQuestion.get());
 				feedbackResponse.setEventFeedback(eventFeedback);
 				return feedbackResponse;
 			}).collect(Collectors.toList());
@@ -237,4 +246,4 @@ public class FeedbackServiceImpl implements FeedbackService {
 		return Mono.justOrEmpty(eventFeedbackRepository.save(eventFeedback));
 		
 	}
-}
+} 

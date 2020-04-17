@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity(name = "feedback_response")
+@Entity
 @Table(name = "feedback_response")
 @Getter
 @Setter

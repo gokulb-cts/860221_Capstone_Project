@@ -13,6 +13,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.cts.capstone.fms.repositories.FmsUserRepository;
+import com.cts.capstone.fms.security.constants.SecurityConstants;
 import com.cts.capstone.fms.service.FmsUserService;
 
 import lombok.AllArgsConstructor;
@@ -47,6 +48,8 @@ public class FmsWebSecurity extends WebSecurityConfigurerAdapter {
 		http.csrf().disable() // Disable csrf for REST API
 				.authorizeRequests().antMatchers(HttpMethod.POST, SIGN_UP_URL) // for POST of this URL
 				.permitAll() // permit without authentication
+				.antMatchers(HttpMethod.POST, SecurityConstants.FEEDBACK_RESPONSE_URL)
+				.permitAll()
 				.anyRequest() // for any other request
 				.authenticated() // do authentication
 				.and().addFilter(getAuthenticaitonFilter()) // Add Authentication Filter

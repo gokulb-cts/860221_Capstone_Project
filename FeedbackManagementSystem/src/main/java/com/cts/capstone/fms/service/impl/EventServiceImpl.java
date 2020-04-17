@@ -88,5 +88,10 @@ public class EventServiceImpl implements EventService {
 	public Mono<Event> getEventByEventId(String eventId) {
 		return Mono.justOrEmpty(eventRepository.findByEventId(eventId));
 	}
+
+	@Override
+	public Flux<Event> getEventsByPocUserId(Long pocUserId) {
+		return Flux.fromIterable(eventRepository.findByPocUserId(pocUserId));
+	}
 	
 }

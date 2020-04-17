@@ -13,7 +13,7 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
-@Entity(name = "authority")
+@Entity
 @Table(name = "authority")
 @Getter
 @Setter

@@ -15,5 +15,7 @@ public interface EventService {
 	public Flux<Event> getAllEvents();
 	
 	public Mono<Event> getEventByEventId(String eventId);
+
+	public Flux<Event> getEventsByPocUserId(Long pocUserId);
 	
 }

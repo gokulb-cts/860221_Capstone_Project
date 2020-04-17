@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cts.capstone.fms.constants.EventReportConstants;
 import com.cts.capstone.fms.dto.EventReportDto;
+import com.cts.capstone.fms.exception.UserNotFoundException;
 import com.cts.capstone.fms.service.EventReportService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +37,6 @@ public class EventReportRestController {
 	EventReportService eventReportService;
 	
 	//Generate Excel Report for download
-	//@PreAuthorize("hasAnyRole('ADMIN','PMO')")
 	@PostMapping(value = EventReportConstants.EVENTS_REPORT_END_POINT + "/download", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Mono<ResponseEntity<InputStreamResource>> downloadEventReport(@RequestBody List<EventReportDto> eventReportDtoList) throws IOException {
 		
@@ -51,7 +51,7 @@ public class EventReportRestController {
 	
 	//Send Report as Email
 	@PostMapping(value = EventReportConstants.EVENTS_REPORT_END_POINT + "/mail/{userId}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
-	public Mono<String> sendEventReportViaMail(@PathVariable Long userId, @RequestBody List<EventReportDto> eventReportDtoList) throws IOException, MessagingException {
+	public Mono<String> sendEventReportViaMail(@PathVariable Long userId, @RequestBody List<EventReportDto> eventReportDtoList) throws IOException, MessagingException, UserNotFoundException {
 		
 		log.info("sendEventReportToMail()");
 		

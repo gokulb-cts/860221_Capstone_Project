@@ -88,7 +88,7 @@ public class Event implements Serializable {
 	public boolean hasEventWithPocUserId(Long pocUserId) {
 		return this.getPocUser()
 				.stream()
-				.anyMatch(user -> user.getUserId() == pocUserId);
+				.anyMatch(user -> user.getUserId().equals(pocUserId));
 	}
 
 }

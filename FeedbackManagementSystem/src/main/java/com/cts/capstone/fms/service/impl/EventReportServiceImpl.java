@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.apache.poi.ss.usermodel.Cell;
@@ -23,18 +22,25 @@ import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import com.cts.capstone.fms.domain.FmsUser;
 import com.cts.capstone.fms.dto.EventReportDto;
+import com.cts.capstone.fms.dto.MailDto;
+import com.cts.capstone.fms.exception.UserNotFoundException;
+import com.cts.capstone.fms.mail.MailSenderHelper;
+import com.cts.capstone.fms.repositories.FmsUserRepository;
 import com.cts.capstone.fms.service.EventReportService;
 
 @Service
 public class EventReportServiceImpl implements EventReportService {
-
+	
 	@Autowired
-	private JavaMailSender javaMailSender;
+	private FmsUserRepository userRepository;
+	
+	@Autowired
+	private MailSenderHelper mailSenderHelper;
 	
 	@Override
 	public ByteArrayInputStream generateEventReportWorkbook(List<EventReportDto> eventReportDtoList) throws IOException {
@@ -107,22 +113,33 @@ public class EventReportServiceImpl implements EventReportService {
 		}
 
 	}
-
+	
+	
 	@Override
-	public void sendEventReportViaMail(Long userId, List<EventReportDto> eventReportDtoList) throws MessagingException, IOException {
-
-		MimeMessage message = javaMailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        helper.setTo("bgokul95@gmail.com");
-        helper.setSubject("Event Report");
-        helper.setText("***This is a System Generated Mail. Please do not reply***", true);
-        ByteArrayInputStream inputStream = this.generateEventReportWorkbook(eventReportDtoList);
-        helper.addAttachment("Event_Report.xlsx", new ByteArrayDataSource(inputStream,"application/vnd.ms-excel"));
-        //FileSystemResource file  = new FileSystemResource(new File(path));
-        //helper.addAttachment("testfile", file);
-        //helper.addAttachment("test.png", new ClassPathResource("test.jpeg"));
-        javaMailSender.send(message);
+	public void sendEventReportViaMail(Long userId, List<EventReportDto> eventReportDtoList) throws MessagingException, IOException, UserNotFoundException {
 		
+		FmsUser user = userRepository.findByUserId(userId);
+        if(user == null) throw new UserNotFoundException("User not found with User ID :" + userId);
+        ByteArrayInputStream inputStream = this.generateEventReportWorkbook(eventReportDtoList);
+                
+        MailDto mailDto = new MailDto();
+        String toMailAddress = "bgokul95@gmail.com"; //user.getEmailId();
+        String content = "***This is a System Generated Mail. Please do not reply***";
+        mailDto.setToMailAddress(toMailAddress);
+        mailDto.setSubject("Event Report");
+        mailDto.setBodyContent(content);
+        mailDto.setAttachmentFileName("Event-Report.xlsx");
+        mailDto.setAttachmentDataSource(new ByteArrayDataSource(inputStream,"application/vnd.ms-excel"));
+        mailDto.setDataSourceType("application/vnd.ms-excel");
+        
+        if(!StringUtils.isEmpty(toMailAddress)) {
+        	mailSenderHelper.sendMail(mailDto);
+        }
+        else {
+        	throw new UserNotFoundException("Email Address not found for given User ID :" + userId);
+        }
+        		
 	}
+	
 
 }

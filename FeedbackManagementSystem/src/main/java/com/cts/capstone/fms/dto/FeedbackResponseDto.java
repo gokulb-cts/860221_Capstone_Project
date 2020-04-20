@@ -9,13 +9,13 @@ import lombok.Data;
 @Data
 public class FeedbackResponseDto {
 
-	@JsonIgnore
 	private Long id;
 	
 	@NotNull(message = "Question ID is empty/missing")
 	private Long questionId;
 	
 	@NotNull(message = "Answer Text is empty/missing")
+	@JsonIgnore
 	private String answerText;
 	
 }

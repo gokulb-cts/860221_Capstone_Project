@@ -50,12 +50,6 @@ public class FmsWebSecurity extends WebSecurityConfigurerAdapter {
 				.antMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll() // permit without authentication
 				.antMatchers(HttpMethod.POST, SecurityConstants.FEEDBACK_URL).permitAll()
 				.antMatchers(HttpMethod.GET, SecurityConstants.FEEDBACK_URL).permitAll()
-				.antMatchers("/v2/api-docs",
-                               "/configuration/ui",
-                               "/swagger-resources/**",
-                               "/configuration/security",
-                               "/swagger-ui.html",
-                               "/webjars/**").permitAll()
 				.anyRequest() // for any other request
 				.authenticated() // do authentication
 				.and().addFilter(getAuthenticaitonFilter()) // Add Authentication Filter

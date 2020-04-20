@@ -42,4 +42,5 @@ public class EventParticipantDetail {
 	
 	private byte feedbackMailSentStatus; 
 
+	private byte feedbackSubmittedStatus;
 }

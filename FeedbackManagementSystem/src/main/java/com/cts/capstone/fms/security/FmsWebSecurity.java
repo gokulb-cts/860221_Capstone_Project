@@ -46,10 +46,10 @@ public class FmsWebSecurity extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable() // Disable csrf for REST API
-				.authorizeRequests().antMatchers(HttpMethod.POST, SIGN_UP_URL) // for POST of this URL
-				.permitAll() // permit without authentication
-				.antMatchers(HttpMethod.POST, SecurityConstants.FEEDBACK_RESPONSE_URL)
-				.permitAll()
+				.authorizeRequests()
+				.antMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll() // permit without authentication
+				.antMatchers(HttpMethod.POST, SecurityConstants.FEEDBACK_URL).permitAll()
+				.antMatchers(HttpMethod.GET, SecurityConstants.FEEDBACK_URL).permitAll()
 				.anyRequest() // for any other request
 				.authenticated() // do authentication
 				.and().addFilter(getAuthenticaitonFilter()) // Add Authentication Filter

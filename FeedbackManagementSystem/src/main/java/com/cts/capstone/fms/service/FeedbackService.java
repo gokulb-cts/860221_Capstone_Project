@@ -5,6 +5,7 @@ import com.cts.capstone.fms.domain.EventParticipationType;
 import com.cts.capstone.fms.domain.FeedbackAnswer;
 import com.cts.capstone.fms.domain.FeedbackQuestion;
 import com.cts.capstone.fms.dto.EventFeedbackDto;
+import com.cts.capstone.fms.dto.EventFeedbackRequestDto;
 import com.cts.capstone.fms.dto.FeedbackAnswerDto;
 import com.cts.capstone.fms.dto.FeedbackQuestionDto;
 
@@ -17,7 +18,7 @@ public interface FeedbackService {
 
 	public Mono<FeedbackQuestion> getFeedbackQuestionByQuestionId(Long questionId);
 	
-	public Mono<FeedbackQuestion> getFeedbackQuestionByParticipationType(EventParticipationType participationType);
+	public Flux<FeedbackQuestion> getFeedbackQuestionByParticipationType(EventParticipationType participationType);
 
 	public Mono<FeedbackQuestion> saveFeedbackQuestion(FeedbackQuestionDto questionDto);
 
@@ -29,6 +30,8 @@ public interface FeedbackService {
 
 	public Mono<FeedbackAnswer> updateFeedbackAnswer(Long answerId, FeedbackAnswerDto feedbackAnswerDto);
 
-	public Mono<EventFeedback> saveFeedback(EventFeedbackDto eventFeedbackDto);
+	public Mono<EventFeedbackRequestDto> getEventFeedbackRequestForParticipant(String eventId, Long userId);
 	
+	public Mono<EventFeedback> saveFeedback(EventFeedbackDto eventFeedbackDto);
+
 }

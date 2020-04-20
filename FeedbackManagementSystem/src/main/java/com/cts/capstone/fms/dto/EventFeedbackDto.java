@@ -20,7 +20,7 @@ public class EventFeedbackDto {
 	@NotNull(message = "Participation Type ID is empty/missing")
 	private Long participationTypeId;
 	
-	private List<FeedbackResponseDto> feedbackResponse;
+	private List<FeedbackResponseDto> feedback;
 
 	private Integer rating;
 

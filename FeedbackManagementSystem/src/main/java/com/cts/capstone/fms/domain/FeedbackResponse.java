@@ -23,7 +23,7 @@ public class FeedbackResponse {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
+	
 	@JsonBackReference
 	@ManyToOne
 	@JoinColumn(name = "event_feedback_id")
@@ -35,5 +35,9 @@ public class FeedbackResponse {
 	private FeedbackQuestion question;
 	
 	private String answerText;
+
+	public FeedbackResponse(FeedbackQuestion question) {
+		this.question = question;
+	}
 	
 }

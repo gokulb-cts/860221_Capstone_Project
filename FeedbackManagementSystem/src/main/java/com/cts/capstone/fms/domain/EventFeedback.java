@@ -44,7 +44,7 @@ public class EventFeedback {
 	
 	@JsonManagedReference
 	@OneToMany(mappedBy = "eventFeedback", cascade = CascadeType.ALL)
-	private List<FeedbackResponse> feedbackResponse;
+	private List<FeedbackResponse> feedback;
 
 	private Integer rating;
 	

@@ -4,11 +4,14 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 
 @Data
 public class EventFeedbackDto {
 	
+	@JsonIgnore
 	private Long id;
 	
 	@NotNull(message = "Event ID is empty/missing")
